@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# The script below will enable me print 'Best Schoo' 9 times. but in the 9th position I will replace it with 'Hi'
+i=2
+while (( i<11 ))
+do
+	echo "Best School"
+	if (( i == 9 ))
+	then
+		echo "Best School"
+		echo "Hi"
+	fi
+	(( i++ ))
+done
