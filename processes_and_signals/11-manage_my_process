@@ -1,29 +1,43 @@
 #!/usr/bin/env bash
-# The script below will manage processes/daemons running in the terminal
+# This script manages the lifecycle of the manage_my_process script. It provides functions to start, stop, and restart the process, and stores the process ID in a PID file for tracking.
 
-command="$1"
+PID_FILE="/var/run/my_process.pid"
 
-if [ -z "$command" ]; then
-  echo "Usage: manage_my_process {start|stop|restart}"
-  exit
-fi
+start_process() {
+	while true
+	do
+    	echo "I am alive!" >> /tmp/my_process
+    	sleep 2
+	done &
+    echo "$!" > "$PID_FILE"
+    echo "manage_my_process started"
+}
 
-if [ "$command" == "start" ]; then
+stop_process() {
+    if [ -f "$PID_FILE" ]; then
+        pid=$(cat "$PID_FILE")
+        kill "$pid"
+        rm "$PID_FILE"
+        echo "manage_my_process stopped"
+    fi
+}
 
-  bash "./manage_my_process" &
-  echo "$!" > "/var/run/my_process.pid"
-  echo "manage_my_process started"
+restart_process() {
+    echo "manage_my_process restarted"
+}
 
-elif [ "$command" == "stop" ]; then
-  [ -e "/var/run/my_process.pid" ] && pkill -f './manage_my_process' && rm "/var/run/my_process.pid"
-  echo "manage_my_process stopped"
-
-elif [ "$command" == "restart" ]; then
-
-  "$0" stop >& "/dev/null"
-  "$0" start >& "/dev/null"
-  echo "manage_my_process restarted"
-
-else
-  echo "Usage: manage_my_process {start|stop|restart}" 
-fi
+case "$1" in
+    start)
+        start_process
+        ;;
+    stop)
+        stop_process
+        ;;
+    restart)
+        restart_process
+        ;;
+    *)
+        echo "Usage: manage_my_process {start|stop|restart}"
+        exit 1
+        ;;
+esac
